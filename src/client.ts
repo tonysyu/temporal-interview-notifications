@@ -1,5 +1,5 @@
 import { Connection, Client } from '@temporalio/client';
-import { subscriptionWorkflow } from './workflows';
+import { cancelSubscription, subscriptionWorkflow } from './workflows';
 import { nanoid } from 'nanoid';
 
 async function run() {
@@ -24,6 +24,9 @@ async function run() {
         workflowId: 'workflow-' + nanoid(),
     });
     console.log(`Started workflow ${handle.workflowId}`);
+
+    // Harded cancellation signal to trigger cancellation flow:
+    await handle.signal(cancelSubscription);
 
     // optional: wait for client result
     console.log(await handle.result()); // Hello, Temporal!

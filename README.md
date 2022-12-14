@@ -17,5 +17,5 @@ of the worker shell:
 
 ```bash
 sendWelcomeEmail for tsyu80@gmail.com
-sendSubscriptionOverEmail for tsyu80@gmail.com
+sendCancellationDuringTrialPeriodEmail for tsyu80@gmail.com
 ```
