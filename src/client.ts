@@ -1,5 +1,5 @@
 import { Connection, Client } from '@temporalio/client';
-import { example } from './workflows';
+import { subscriptionWorkflow } from './workflows';
 import { nanoid } from 'nanoid';
 
 async function run() {
@@ -16,9 +16,9 @@ async function run() {
         // namespace: 'foo.bar', // connects to 'default' namespace if not specified
     });
 
-    const handle = await client.workflow.start(example, {
+    const handle = await client.workflow.start(subscriptionWorkflow, {
         // type inference works! args: [name: string]
-        args: ['Temporal'],
+        args: ['tsyu80@gmail.com', '30 seconds'],
         taskQueue: 'hello-world',
         // in practice, use a meaningful business id, eg customerId or transactionId
         workflowId: 'workflow-' + nanoid(),

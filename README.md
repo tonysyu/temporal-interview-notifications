@@ -1,8 +1,7 @@
 # Hello World
 
-This is the default project that is scaffolded out when you run `npx @temporalio/create@latest ./myfolder`.
-
-The [Hello World Tutorial](https://docs.temporal.io/typescript/hello-world/) walks through the code in this sample.
+The original code is based off the [Hello World Tutorial](https://docs.temporal.io/typescript/hello-world/).
+The code was then modified based on the [Subscription Workflow Tutorial](https://learn.temporal.io/tutorials/typescript/subscriptions/).
 
 ### Running this sample
 
@@ -13,8 +12,10 @@ Running this sample requires 3 separate shells:
 1. Worker shell: `npm run start.watch` to start the Worker
 1. Workflow shell: `npm run workflow` to run the Workflow Client.
 
-The Workflow should return:
+Note that console messages are used in place of email messages, and these are output to the logs
+of the worker shell:
 
 ```bash
-Hello, Temporal!
+sendWelcomeEmail for tsyu80@gmail.com
+sendSubscriptionOverEmail for tsyu80@gmail.com
 ```
