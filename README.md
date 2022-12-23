@@ -1,4 +1,4 @@
-# Hello World
+# Rsvp Notification Worfklow Example
 
 The original code is based off the [Hello World Tutorial](https://docs.temporal.io/typescript/hello-world/).
 The code was then modified based on the [Subscription Workflow Tutorial](https://learn.temporal.io/tutorials/typescript/subscriptions/).
@@ -23,13 +23,13 @@ The following examples use [httpie](https://httpie.io/) (i.e. command `http`) to
 interact with the App.
 
 
-As a simple example, lets have user "alice" start the hello-world workflow, followed by
-"bob". Right after that, "alice" cancels the workflows:
+As a simple example, lets have user "alice" start the Rsvp workflow, followed by
+"bob". Right after that, "alice" cancels the workflow:
 
 ```sh
-http http://localhost:3000/start-hello-world email=alice@test.com
-http http://localhost:3000/start-hello-world email=bob@test.com
-http http://localhost:3000/cancel-hello-world email=alice@test.com
+http http://localhost:3000/start-rsvp email=alice@test.com
+http http://localhost:3000/start-rsvp email=bob@test.com
+http http://localhost:3000/cancel-rsvp email=alice@test.com
 ```
 
 Console messages are used in place of email messages, and these are output to the logs

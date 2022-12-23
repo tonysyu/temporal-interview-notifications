@@ -1,17 +1,17 @@
 import chalk from 'chalk';
 
-export async function sendCancellationDuringTrialPeriodEmail(email: string): Promise<boolean> {
-    log(email, 'cancelled during trial period');
+export async function notifyEventCancelled(email: string): Promise<boolean> {
+    log(email, 'Your interview was cancelled');
     return true
 }
 
-export async function sendSubscriptionOverEmail(email: string): Promise<boolean> {
-    log(email, 'send subscription offer');
+export async function notifyStartsNow(email: string): Promise<boolean> {
+    log(email, 'Your interview starts now');
     return true
 }
 
-export async function sendWelcomeEmail(email: string): Promise<boolean> {
-    log(email, 'send welcome email');
+export async function notifyRsvpConfirmed(email: string): Promise<boolean> {
+    log(email, 'You have successfully RSVPed');
     return true
 }
 

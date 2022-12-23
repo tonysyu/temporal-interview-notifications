@@ -3,7 +3,7 @@ import { condition, defineSignal, proxyActivities, setHandler } from '@temporali
 import type * as activities from './activities';
 
 const {
-    sendCancellationDuringTrialPeriodEmail, sendSubscriptionOverEmail, sendWelcomeEmail
+    notifyEventCancelled, notifyStartsNow, notifyRsvpConfirmed
 } = proxyActivities<typeof activities>({
     startToCloseTimeout: '1 minute',
 });
@@ -18,10 +18,10 @@ export async function subscriptionWorkflow(
     let isCanceled = false;
     setHandler(cancelSubscription, () => void (isCanceled = true));
 
-    await sendWelcomeEmail(email);
+    await notifyRsvpConfirmed(email);
     if (await condition(() => isCanceled, trialPeriod)) {
-        await sendCancellationDuringTrialPeriodEmail(email);
+        await notifyEventCancelled(email);
     } else {
-        await sendSubscriptionOverEmail(email);
+        await notifyStartsNow(email);
     }
 }
