@@ -18,7 +18,7 @@ async function run() {
 
     const handle = await client.workflow.start(subscriptionWorkflow, {
         // type inference works! args: [name: string]
-        args: ['tsyu80@gmail.com', '30 seconds'],
+        args: ['tsyu80@gmail.com', '5 seconds'],
         taskQueue: 'hello-world',
         // in practice, use a meaningful business id, eg customerId or transactionId
         workflowId: 'workflow-' + nanoid(),
@@ -26,6 +26,7 @@ async function run() {
     console.log(`Started workflow ${handle.workflowId}`);
 
     // Harded cancellation signal to trigger cancellation flow:
+    // Comment out to trigger subscription workflow
     await handle.signal(cancelSubscription);
 
     // optional: wait for client result

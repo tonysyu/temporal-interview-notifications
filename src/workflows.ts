@@ -1,4 +1,4 @@
-import { defineSignal, proxyActivities, setHandler, sleep } from '@temporalio/workflow';
+import { condition, defineSignal, proxyActivities, setHandler } from '@temporalio/workflow';
 // Only import the activity types
 import type * as activities from './activities';
 
@@ -19,8 +19,7 @@ export async function subscriptionWorkflow(
     setHandler(cancelSubscription, () => void (isCanceled = true));
 
     await sendWelcomeEmail(email);
-    await sleep(trialPeriod);
-    if (isCanceled) {
+    if (await condition(() => isCanceled, trialPeriod)) {
         await sendCancellationDuringTrialPeriodEmail(email);
     } else {
         await sendSubscriptionOverEmail(email);
