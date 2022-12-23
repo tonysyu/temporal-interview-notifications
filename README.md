@@ -27,9 +27,9 @@ As a simple example, lets have user "alice" start the Rsvp workflow, followed by
 "bob". Right after that, "alice" cancels the workflow:
 
 ```sh
-http http://localhost:3000/start-rsvp email=alice@test.com
-http http://localhost:3000/start-rsvp email=bob@test.com
-http http://localhost:3000/cancel-rsvp email=alice@test.com
+http http://localhost:3000/workflows/rsvps/start email=alice@test.com
+http http://localhost:3000/workflows/rsvps/start email=bob@test.com
+http http://localhost:3000/workflows/rsvps/update email=alice@test.com
 ```
 
 Console messages are used in place of email messages, and these are output to the logs
