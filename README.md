@@ -36,10 +36,11 @@ Console messages are used in place of email messages, and these are output to th
 of the worker shell:
 
 ```sh
-alice@test.com: send welcome email
-bob@test.com: send welcome email
-alice@test.com: cancelled during trial period
-bob@test.com: send subscription offer
+11:57:16 AM: alice@test.com - send welcome email
+11:57:16 AM: bob@test.com - send welcome email
+11:57:16 AM: alice@test.com - cancelled during trial period
+11:57:26 AM: bob@test.com - send subscription offer
 ```
 
-Note that the last message will take some time to display (delay defined in workflow).
+Note that the last message will take some time to display (currently defined in workflow
+as 10 second delay).
