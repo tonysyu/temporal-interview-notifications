@@ -1,39 +1,51 @@
-import { Connection, Client } from '@temporalio/client';
+// Temporal client responsible for initiating workflow
+import { Connection, WorkflowClient } from '@temporalio/client';
 import { cancelSubscription, subscriptionWorkflow } from './workflows';
-import { nanoid } from 'nanoid';
 
-async function run() {
+
+const TASK_NAME = 'hello-world';
+
+function helloWorldWorkflowId(email: string): string {
+    return `${TASK_NAME}-${email}`;
+}
+
+
+async function getWorkflowClient(): Promise<WorkflowClient> {
+
     // Connect to the default Server location (localhost:7233)
     const connection = await Connection.connect();
-    // In production, pass options to configure TLS and other settings:
-    // {
-    //   address: 'foo.bar.tmprl.cloud',
-    //   tls: {}
-    // }
 
-    const client = new Client({
+    return new WorkflowClient({
         connection,
         // namespace: 'foo.bar', // connects to 'default' namespace if not specified
     });
+}
 
-    const handle = await client.workflow.start(subscriptionWorkflow, {
-        // type inference works! args: [name: string]
-        args: ['tsyu80@gmail.com', '5 seconds'],
-        taskQueue: 'hello-world',
-        // in practice, use a meaningful business id, eg customerId or transactionId
-        workflowId: 'workflow-' + nanoid(),
+
+export async function run(email: string): Promise<string> {
+    const client = await getWorkflowClient();
+
+    const workflowId = helloWorldWorkflowId(email);
+
+    const handle = await client.start(subscriptionWorkflow, {
+        args: [email, '10 seconds'],
+        taskQueue: TASK_NAME,
+        workflowId,
     });
     console.log(`Started workflow ${handle.workflowId}`);
+    return workflowId
+}
 
-    // Harded cancellation signal to trigger cancellation flow:
-    // Comment out to trigger subscription workflow
+
+export async function cancel(email: string) {
+    const client = await getWorkflowClient();
+    const workflowId = helloWorldWorkflowId(email);
+    const handle = client.getHandle(workflowId)
+
+    // Trigger cancel signal on the workflow
     await handle.signal(cancelSubscription);
 
     // optional: wait for client result
     console.log(await handle.result()); // Hello, Temporal!
+    return workflowId
 }
-
-run().catch((err) => {
-    console.error(err);
-    process.exit(1);
-});
