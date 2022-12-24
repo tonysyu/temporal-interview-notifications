@@ -1,10 +1,10 @@
 // Temporal client responsible for initiating workflow
 import { Connection, WorkflowClient } from '@temporalio/client';
 import { TASK_NAME } from './constants';
-import { cancelSubscription, subscriptionWorkflow } from './workflows';
+import { cancelSubscription, rsvpWorkflow } from './workflows';
 
-function rsvpWorkflowId(email: string): string {
-    return `${TASK_NAME}-${email}`;
+function rsvpWorkflowId(user: string): string {
+    return `${TASK_NAME}-${user}`;
 }
 
 
@@ -20,13 +20,13 @@ async function getWorkflowClient(): Promise<WorkflowClient> {
 }
 
 
-export async function run(email: string): Promise<string> {
+export async function run(user: string): Promise<string> {
     const client = await getWorkflowClient();
 
-    const workflowId = rsvpWorkflowId(email);
+    const workflowId = rsvpWorkflowId(user);
 
-    const handle = await client.start(subscriptionWorkflow, {
-        args: [email, '10 seconds'],
+    const handle = await client.start(rsvpWorkflow, {
+        args: [user, '10 seconds'],
         taskQueue: TASK_NAME,
         workflowId,
     });
@@ -35,9 +35,9 @@ export async function run(email: string): Promise<string> {
 }
 
 
-export async function cancel(email: string) {
+export async function cancel(user: string) {
     const client = await getWorkflowClient();
-    const workflowId = rsvpWorkflowId(email);
+    const workflowId = rsvpWorkflowId(user);
     const handle = client.getHandle(workflowId)
 
     // Trigger cancel signal on the workflow

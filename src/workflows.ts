@@ -2,26 +2,23 @@ import { condition, defineSignal, proxyActivities, setHandler } from '@temporali
 // Only import the activity types
 import type * as activities from './activities';
 
-const {
-    notifyEventCancelled, notifyStartsNow, notifyRsvpConfirmed
-} = proxyActivities<typeof activities>({
+const act = proxyActivities<typeof activities>({
     startToCloseTimeout: '1 minute',
 });
 
 export const cancelSubscription = defineSignal('cancelSignal');
 
-export async function subscriptionWorkflow(
-    email: string,
-    trialPeriod: string | number
+export async function rsvpWorkflow(
+    user: string,
+    timeUntilInterview: string | number
 ) {
+    let isCancelled = false;
+    setHandler(cancelSubscription, () => void (isCancelled = true));
 
-    let isCanceled = false;
-    setHandler(cancelSubscription, () => void (isCanceled = true));
-
-    await notifyRsvpConfirmed(email);
-    if (await condition(() => isCanceled, trialPeriod)) {
-        await notifyEventCancelled(email);
+    await act.notifyInterviewConfirmed(user);
+    if (await condition(() => isCancelled, timeUntilInterview)) {
+        await act.notifyInterviewCancelled(user);
     } else {
-        await notifyStartsNow(email);
+        await act.notifyInterviewStartsNow(user);
     }
 }
