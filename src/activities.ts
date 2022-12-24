@@ -1,17 +1,23 @@
 import chalk from 'chalk';
 
+import * as constants from './constants';
+import { requestNotification } from './utils';
+
 export async function notifyInterviewCancelled(user: string): Promise<boolean> {
-    log(user, 'Your interview was cancelled');
+    requestNotification(user, constants.INTERVIEW_CANCELLED);
+    log(user, 'Sent interview cancellation notification');
     return true
 }
 
 export async function notifyInterviewStartsNow(user: string): Promise<boolean> {
-    log(user, 'Your interview starts now');
+    requestNotification(user, constants.INTERVIEW_STARTS_NOW);
+    log(user, 'Sent interview starts now notification');
     return true
 }
 
 export async function notifyInterviewConfirmed(user: string): Promise<boolean> {
-    log(user, 'Your interview is scheduled');
+    requestNotification(user, constants.INTERVIEW_CONFIRMATION);
+    log(user, 'Sent interview scheduled confirmation');
     return true
 }
 

@@ -26,6 +26,7 @@
     "@temporalio/client": "^1.5.2",
     "@temporalio/worker": "^1.5.2",
     "@temporalio/workflow": "^1.5.2",
+    "axios": "^1.2.1",
     "chalk": "^4.1.2",
     "express": "^4.18.2",
     "nanoid": "3.x"
