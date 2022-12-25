@@ -1,8 +1,8 @@
 import express from 'express';
 import { NOTIFICATION_PATH, PORT, WORKFLOW_PATH } from './constants';
+import { errorHandler } from './webapp/errors';
 import { router as notificationRouter } from './webapp/notifications';
 import { router as workflowRouter } from './webapp/workflows';
-import { errorHandler } from './webapp/utils';
 
 const app = express()
 

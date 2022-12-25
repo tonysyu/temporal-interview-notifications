@@ -1,6 +1,7 @@
 import express from 'express';
 
-import { BadInputError, mockEmail, randomFailure } from './utils';
+import { BadInputError } from './errors';
+import { mockEmail, randomFailure } from './utils';
 import * as constants from '../constants';
 
 export const router = express.Router()
