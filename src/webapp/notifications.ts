@@ -1,19 +1,24 @@
 import express from 'express';
 
-import { mockEmail } from './utils';
+import { BadInputError, mockEmail, randomFailure } from './utils';
 import * as constants from '../constants';
 
 export const router = express.Router()
 
-router.post('/send', async (req, res) => {
-    const user = validateUser(req.body.user);
-    const message = getNotificationMessage(req.body.type);
-    console.log(mockEmail(user, message));
+router.post('/send', async (req, res, next) => {
+    try {
+        randomFailure(process.env.NOTIFICATION_SERVICE_FLAKINESS);
+        const user = validateUser(req.body.user);
+        const message = getNotificationMessage(req.body.type);
+        console.log(mockEmail(user, message));
+    } catch (err) {
+        next(err)
+    }
 })
 
 function validateUser(user: string | null): string {
     if (!user) {
-        throw Error('User not provided');
+        throw new BadInputError('User not provided');
     }
     return user;
 }
@@ -21,7 +26,7 @@ function validateUser(user: string | null): string {
 function getNotificationMessage(notificationType: string): string {
     const message = NOTIFICATION_MESSAGES.get(notificationType);
     if (!message) {
-        throw Error(`Unknown notification type ${notificationType}`);
+        throw new BadInputError(`Unknown notification type ${notificationType}`);
     }
     return message;
 }

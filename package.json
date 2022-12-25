@@ -10,7 +10,8 @@
     "worker": "ts-node src/worker.ts",
     "worker.watch": "nodemon src/worker.ts",
     "app": "ts-node src/app.ts",
-    "app.watch": "nodemon src/app.ts"
+    "app.watch": "nodemon src/app.ts",
+    "app.flakey": "NOTIFICATION_SERVICE_FLAKINESS=0.5 nodemon src/app.ts"
   },
   "nodemonConfig": {
     "execMap": {
