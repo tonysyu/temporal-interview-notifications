@@ -8,7 +8,7 @@ const act = proxyActivities<typeof activities>({
 
 export const cancelSubscription = defineSignal('cancelSignal');
 
-export async function rsvpWorkflow(
+export async function interviewNotificationWorkflow(
     user: string,
     timeUntilInterview: string | number
 ) {

@@ -1,4 +1,4 @@
-# Rsvp Notification Worfklow Example
+# Scheduled Interview Notification Worfklow Example
 
 The original code is based off the [Hello World Tutorial](https://learn.temporal.io/getting_started/typescript/hello_world_in_typescript/).
 The code was then modified based on the [Subscription Workflow Tutorial](https://learn.temporal.io/tutorials/typescript/subscriptions/).
@@ -57,11 +57,11 @@ interact with the Web App.
 
 #### Basic workflow: Confirmation and starts-now notifications
 
-As a simple example, lets have user "alice" start the Rsvp workflow, by hitting the
-Web App:
+As a simple example, lets have user "alice" start the interview notification workflow,
+by hitting the Web App API:
 
 ```sh
-http http://localhost:3000/workflows/rsvps/start user=alice
+http http://localhost:3000/workflows/interviews/start user=alice
 ```
 
 ##### Worker output
@@ -69,8 +69,8 @@ http http://localhost:3000/workflows/rsvps/start user=alice
 The worker is responsible for running through the notification workflow, making requests
 to the "Notification Service":
 ```sh
-10:12:50 PM: alice - Sent interview scheduled confirmation
-10:13:00 PM: alice - Sent interview starts now notification
+2:45:08 PM: alice - Sent interview scheduled confirmation
+2:45:18 PM: alice - Sent interview starts now notification
 ```
 
 Note that the last message will take some time to display (currently defined in workflow
@@ -84,17 +84,17 @@ interacts with the Temporal Workflow:
 
 ```sh
 From: "alice" <alice@test.com>
-To: "Indeed Interviews" <test@indeed.com>
-Date: Sat, 24 Dec 2022 04:12:50 GMT
-Subject: Your interview starts now
+To: "Talent Attraction" <hiring@fake.org>
+Date: Mon, 26 Dec 2022 20:45:08 GMT
+Subject: Your interview is scheduled
 
 ...
 
 
 From: "alice" <alice@test.com>
-To: "Indeed Interviews" <test@indeed.com>
-Date: Sat, 24 Dec 2022 04:13:00 GMT
-Subject: Your interview was cancelled
+To: "Talent Attraction" <hiring@fake.org>
+Date: Mon, 26 Dec 2022 20:45:18 GMT
+Subject: Your interview starts now
 
 ...
 ```

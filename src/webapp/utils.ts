@@ -3,7 +3,7 @@ import { ServiceUnavailableError } from './errors';
 
 export const mockEmail = function(user: string, subject: string): string {
     const to = `"${user}" <${user}@test.com>`;
-    const from = '"Indeed Interviews" <test@indeed.com>';
+    const from = '"Talent Attraction" <hiring@fake.org>';
     const date = new Date().toUTCString();
     return `
         From: ${to}
