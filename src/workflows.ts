@@ -6,14 +6,14 @@ const act = proxyActivities<typeof activities>({
     startToCloseTimeout: '1 minute',
 });
 
-export const cancelSubscription = defineSignal('cancelSignal');
+export const cancelInterview = defineSignal('cancelSignal');
 
 export async function interviewNotificationWorkflow(
     user: string,
     timeUntilInterview: string | number
 ) {
     let isCancelled = false;
-    setHandler(cancelSubscription, () => void (isCancelled = true));
+    setHandler(cancelInterview, () => void (isCancelled = true));
 
     await act.notifyInterviewConfirmed(user);
     if (await condition(() => isCancelled, timeUntilInterview)) {

@@ -54,6 +54,12 @@ You'll also want to fourth shell to interact with the Web App.
 The following examples use [httpie](https://httpie.io/) (i.e. command `http`) to
 interact with the Web App.
 
+To make the examples easier to read, we'll define the following shell variables for the
+webapp endpoints that interact with the workflow:
+```sh
+START=http://localhost:3000/workflows/interviews/start
+UPDATE=http://localhost:3000/workflows/interviews/update
+```
 
 #### Basic workflow: Confirmation and starts-now notifications
 
@@ -61,13 +67,13 @@ As a simple example, lets have user "alice" start the interview notification wor
 by hitting the Web App API:
 
 ```sh
-http http://localhost:3000/workflows/interviews/start user=alice
+http $START user=alice
 ```
 
 ##### Worker output
 
-The worker is responsible for running through the notification workflow, making requests
-to the "Notification Service":
+The worker is responsible for running through the notification workflow and making
+requests to the "Notification Service". For the example above, the output looks like:
 ```sh
 2:45:08 PM: alice - Sent interview scheduled confirmation
 2:45:18 PM: alice - Sent interview starts now notification
@@ -79,8 +85,8 @@ as 10 second delay).
 ##### Web App output
 
 For convenience, the "Notification Service" is actually the same Web App used to
-interacts with the Temporal Workflow:
-
+interact with the Temporal Workflow, so the notification output can be seen in the app
+shell:
 
 ```sh
 From: "alice" <alice@test.com>
@@ -97,4 +103,103 @@ Date: Mon, 26 Dec 2022 20:45:18 GMT
 Subject: Your interview starts now
 
 ...
+```
+
+#### Cancellation workflow
+
+Another common case is to schedule an interview and then cancel it:
+
+```sh
+http $START user=alice
+http $UPDATE user=alice signal=CANCEL
+```
+
+The worker will output the its interactions with the notification service:
+```sh
+2:02:57 PM: alice - Sent interview scheduled confirmation
+2:02:59 PM: alice - Sent interview cancellation notification
+```
+
+And the notification service will "send" the confirmation and cancellation messages:
+
+```sh
+From: "alice" <alice@test.com>
+To: "Talent Attraction" <hiring@fake.org>
+Date: Tue, 27 Dec 2022 20:02:57 GMT
+Subject: Your interview is scheduled
+
+...
+
+
+From: "alice" <alice@test.com>
+To: "Talent Attraction" <hiring@fake.org>
+Date: Tue, 27 Dec 2022 20:02:59 GMT
+Subject: Your interview was cancelled
+
+...
+
+```
+
+#### Simulating flaking services
+
+One of the core capabilities of Temporal is to standardize and simplify retry logic. To
+exercise this logic, you can run the app with `NOTIFICATION_SERVICE_FLAKINESS`:
+```sh
+NOTIFICATION_SERVICE_FLAKINESS=0.5 npm run app.watch
+```
+The `0.5` here causes the notification service to return a 503 Service Unavailable error
+about 50% of the time.
+
+You can start the workflow like normal:
+```sh
+http $START user=alice
+```
+
+The following example shows the confirmation notification is sent normally, and then
+there are multiple failed attempts to send the cancellation notification before finally
+succeeding:
+```sh
+2:14:57 PM: alice - Sent interview scheduled confirmation
+2022-12-27T20:15:07.785Z [WARN] Activity failed {
+  ...
+  attempt: 1,
+  ...
+}
+2022-12-27T20:15:08.825Z [WARN] Activity failed {
+  ...
+  attempt: 2,
+  ...
+}
+2022-12-27T20:15:10.854Z [WARN] Activity failed {
+  ...
+  attempt: 3,
+  ...
+}
+2:15:14 PM: alice - Sent interview starts now notification
+```
+Note that the first failed send is about 10 seconds after the confirmation notification
+(i.e. the pre-defined delay between scheduled and start). The first retry after that
+failure happens less than a second later, and each subsequent attempt takes longer and
+longer due to exponential backoff. See <https://docs.temporal.io/concepts/what-is-a-retry-policy>
+
+The app server displays the notifications plus some logging for the 503 errors:
+```sh
+From: "alice" <alice@test.com>
+To: "Talent Attraction" <hiring@fake.org>
+Date: Tue, 27 Dec 2022 20:14:57 GMT
+Subject: Your interview is scheduled
+
+...
+
+503: Service Unavailable
+503: Service Unavailable
+503: Service Unavailable
+
+From: "alice" <alice@test.com>
+To: "Talent Attraction" <hiring@fake.org>
+Date: Tue, 27 Dec 2022 20:15:14 GMT
+Subject: Your interview starts now
+
+...
+
 ```

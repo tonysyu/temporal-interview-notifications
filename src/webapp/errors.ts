@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { WorkflowNotFoundError } from '@temporalio/workflow';
 
 abstract class HttpError {
     abstract status: number;
@@ -14,8 +15,10 @@ export const errorHandler = function(err: Error | HttpError, req: Request, res: 
         console.log(`${err.status}: ${err.message}`);
         res.status(err.status)
         res.send(err.message)
+    } else if (err instanceof WorkflowNotFoundError) {
+        res.status(400)
+        res.send('Workflow not found. Call `start` before `update`.')
     } else {
-        console.log("ERROR HAS NO STATUS");
         next(err)
     }
 }
