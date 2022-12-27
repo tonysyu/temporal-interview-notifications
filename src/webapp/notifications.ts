@@ -12,6 +12,7 @@ router.post('/send', async (req, res, next) => {
         const user = validateUser(req.body.user);
         const message = getNotificationMessage(req.body.type);
         console.log(mockEmail(user, message));
+        res.send(`Sent ${req.body.type} message`)
     } catch (err) {
         next(err)
     }
