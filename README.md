@@ -43,11 +43,14 @@ Before getting started, you
 
 Running this sample requires 3 separate shells:
 1. Server shell: `cd temporal-server/; docker-compose up` to start the Temporal Server
-1. Worker shell: `npm run worker.watch` to start the Worker
-1. Web App shell: `npm run app.watch` to run an Express app, that will interact with
+1. Worker shell: `./worker.sh` to start the Worker
+1. Web App shell: `./app.sh` to run an Express app, that will interact with
    the Workflow Client.
 
 You'll also want to fourth shell to interact with the Web App.
+
+Note that the `worker.sh` and `app.sh` are simple wrappers around npm scripts to display
+the script name in the shell title bar and easily distinguish the two shells.
 
 ### Starting and interacting with workflows
 
@@ -145,7 +148,7 @@ Subject: Your interview was cancelled
 One of the core capabilities of Temporal is to standardize and simplify retry logic. To
 exercise this logic, you can run the app with `NOTIFICATION_SERVICE_FLAKINESS`:
 ```sh
-NOTIFICATION_SERVICE_FLAKINESS=0.5 npm run app.watch
+NOTIFICATION_SERVICE_FLAKINESS=0.5 ./app.sh
 ```
 The `0.5` here causes the notification service to return a 503 Service Unavailable error
 about 50% of the time.
