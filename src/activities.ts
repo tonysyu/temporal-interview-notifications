@@ -21,6 +21,17 @@ export async function notifyInterviewConfirmed(user: string): Promise<boolean> {
     return true
 }
 
+export async function notifyInterviewerWaiting(user: string): Promise<boolean> {
+    await requestNotification(user, constants.INTERVIEWER_WAITING);
+    log(user, 'Sent interviewer waiting notification');
+    return true
+}
+
+export async function logMessage(user: string, message: string): Promise<boolean> {
+    log(user, message);
+    return true
+}
+
 function log(user: string, action: string) {
     const formattedEmail = chalk.yellowBright.bold(user);
     const formattedAction = chalk.whiteBright.bold(action);

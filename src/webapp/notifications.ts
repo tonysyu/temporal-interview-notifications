@@ -37,4 +37,5 @@ const NOTIFICATION_MESSAGES = new Map([
     [constants.INTERVIEW_CONFIRMATION, 'Your interview is scheduled'],
     [constants.INTERVIEW_STARTS_NOW, 'Your interview starts now'],
     [constants.INTERVIEW_CANCELLED, 'Your interview was cancelled'],
+    [constants.INTERVIEWER_WAITING, 'Your interviewer is waiting'],
 ])

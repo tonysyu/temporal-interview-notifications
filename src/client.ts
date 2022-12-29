@@ -1,10 +1,16 @@
 // Temporal client responsible for initiating workflow
 import { Connection, WorkflowClient } from '@temporalio/client';
-import { TASK_NAME } from './constants';
-import { cancelInterview, interviewNotificationWorkflow } from './workflows';
+import * as constants from './constants';
+import * as workflows from './workflows';
+
+const SIGNALS = new Map([
+    [constants.CANCEL_SIGNAL, workflows.cancelInterview],
+    [constants.CANDIDATE_JOIN_SIGNAL, workflows.candidateJoined],
+    [constants.INTERVIEWER_READY_SIGNAL, workflows.interviewerReady],
+]);
 
 function interviewNotificationWorkflowId(user: string): string {
-    return `${TASK_NAME}-${user}`;
+    return `${constants.TASK_NAME}-${user}`;
 }
 
 
@@ -19,27 +25,33 @@ async function getWorkflowClient(): Promise<WorkflowClient> {
 }
 
 
-export async function run(user: string, timeUntilInterview: string): Promise<string> {
+export async function start(
+    user: string,
+    timeUntilInterview: string,
+    interviewDuration: string,
+): Promise<string> {
     const client = await getWorkflowClient();
 
     const workflowId = interviewNotificationWorkflowId(user);
 
-    const handle = await client.start(interviewNotificationWorkflow, {
-        args: [user, timeUntilInterview],
-        taskQueue: TASK_NAME,
+    await client.start(workflows.interviewNotificationWorkflow, {
+        args: [user, timeUntilInterview, interviewDuration],
+        taskQueue: constants.TASK_NAME,
         workflowId,
     });
-    console.log(`Started workflow ${handle.workflowId}`);
     return workflowId
 }
 
 
-export async function cancel(user: string) {
+export async function signal(user: string, signal: constants.SignalType) {
     const client = await getWorkflowClient();
     const workflowId = interviewNotificationWorkflowId(user);
     const handle = client.getHandle(workflowId)
 
-    await handle.signal(cancelInterview);
+    const signalDef = SIGNALS.get(signal)
+    if (signalDef) {
+        await handle.signal(signalDef);
+    }
 
     return workflowId
 }
