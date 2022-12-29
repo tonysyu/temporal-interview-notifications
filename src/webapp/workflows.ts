@@ -14,7 +14,8 @@ const NOTIFICATION_MESSAGES = new Map<string, WorkflowSignal>([
 ]);
 
 router.post('/interviews/start', async (req, res) => {
-    const workflowId = await client.run(req.body.user);
+    const startTime = req.body.startTime ?? '10 seconds'
+    const workflowId = await client.run(req.body.user, startTime);
     res.json({
         message: `Interview workflow started: ${workflowId}`,
     });

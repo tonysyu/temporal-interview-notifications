@@ -19,13 +19,13 @@ async function getWorkflowClient(): Promise<WorkflowClient> {
 }
 
 
-export async function run(user: string): Promise<string> {
+export async function run(user: string, timeUntilInterview: string): Promise<string> {
     const client = await getWorkflowClient();
 
     const workflowId = interviewNotificationWorkflowId(user);
 
     const handle = await client.start(interviewNotificationWorkflow, {
-        args: [user, '10 seconds'],
+        args: [user, timeUntilInterview],
         taskQueue: TASK_NAME,
         workflowId,
     });
