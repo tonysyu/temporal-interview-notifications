@@ -6,22 +6,9 @@ This code was originally based off Temporal's
 That skeleton was modified to implement an example centered around notifications for
 scheduled interviews. The workflow can be visualized with the following flowchart:
 
-```mermaid
-graph TD
-    A((Start)) --> B[Notification: <br/> Interview <br/> confirmation]
-    B --> C((Wait for <br/> startTime or <br/> signal))
-    C -->|"Timer(startTime)"| D[Notification: <br/> Interview <br/> starts-now]
- 
-    C -->|CANCEL| E[Notification: <br/> Interview <br/> cancelled]
-    C -->|CANDIDATE_JOIN| Z((End))
-    C -->|INTERVIEWER_READY| F[Notification: <br/> Interviewer <br/> waiting]
-    D --> |INTERVIEWER_READY| G[Notification: <br/> Interviewer <br/> waiting]
-    D --> |CANDIDATE_JOIN| Z
-    D --> |"Timer(endTime)"| Z
-    E --> Z
-    F --> Z
-    G --> Z
-```
+![Workflow Diagram](assets/WorkflowDiagram.png)
+
+This workflow translates fairly directly into code in [workflows.ts](src/workflows.ts).
 
 ## Code organization
 
