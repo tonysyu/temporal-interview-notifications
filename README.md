@@ -17,6 +17,7 @@ graph TD
     C -->|INTERVIEWER_READY| F[Notification: <br/> Interviewer <br/> waiting]
     D --> |INTERVIEWER_READY| G[Notification: <br/> Interviewer <br/> waiting]
     D --> |CANDIDATE_JOIN| Z
+    D --> |"Timer(endTime)"| Z
     E --> Z
     F --> Z
     G --> Z
