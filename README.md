@@ -1,7 +1,9 @@
 # Scheduled Interview Notification Worfklow Example
 
 This code was originally based off Temporal's
-[Hello World Tutorial](https://learn.temporal.io/getting_started/typescript/hello_world_in_typescript/).
+[Hello World](https://learn.temporal.io/getting_started/typescript/hello_world_in_typescript/)
+and [Subscription Workflow](https://learn.temporal.io/tutorials/typescript/subscriptions/)
+tutorials.
 
 That skeleton was modified to implement an example centered around notifications for
 scheduled interviews. The workflow can be visualized with the following flowchart:
@@ -30,7 +32,7 @@ The main parts of this example map directly to the components described above:
 - `src/app.ts` + `src/webapp/*`: Express app that uses Temporal Client to initiate
   workflows and send signals to workflows.
   - This app is also being used as a mock Notification Service. Typically, this would be
-    completely separate service, but this app is reused for convenience.
+    a completely separate service, but it's embedded in this app for convenience.
 
 ## Running this example
 
@@ -39,7 +41,7 @@ The main parts of this example map directly to the components described above:
 Before getting started, you
 - Clone the Temporal Server repo into this directory:
   ```sh
-  git clone https://github.com/temporalio/docker-compose.git temporal-server`
+  git clone https://github.com/temporalio/docker-compose.git temporal-server
   ```
 - Install dependencies:
   ```sh
@@ -71,7 +73,9 @@ START=http://localhost:3000/workflows/interviews/start
 UPDATE=http://localhost:3000/workflows/interviews/update
 ```
 
-#### Basic workflow: Confirmation and starts-now notifications
+## Examples
+
+### Basic workflow: Confirmation and starts-now notifications
 
 As a simple example, lets have user "alice" start the interview notification workflow,
 by hitting the Web App API:
@@ -80,7 +84,7 @@ by hitting the Web App API:
 http $START user=alice
 ```
 
-##### Worker output
+#### Worker output
 
 The worker is responsible for running through the notification workflow and making
 requests to the "Notification Service". For the example above, the output looks like:
@@ -96,7 +100,7 @@ workflow as a 10 second delay. The actual delay is typically around 12 seconds b
 the workflow calls multiple `condition`s with the 10 second delay, and each condition
 requires a roundtrip between Temporal Server and the Worker.
 
-##### Web App output
+#### Web App output
 
 For convenience, the "Notification Service" is actually the same Web App used to
 interact with the Temporal Workflow, so the notification output can be seen in the app
@@ -122,7 +126,7 @@ Subject: Your interview starts now
 In many of the following examples, the mock emails will be left out of the explanation,
 but you should expect to see these mock emails in the app output.
 
-#### Example workflow: Interviewer joins _after_ scheduled start time
+### Example workflow: Interviewer joins _after_ scheduled start time
 
 If the interviewer joins _after_ the scheduled start time of the interview, we send an
 additional nudge to prompt the candidate to join.
@@ -142,7 +146,7 @@ The worker will output should display something like the following:
 9:33:57 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
 ```
 
-#### Example workflow: Interviewer joins _before_ scheduled start time
+### Example workflow: Interviewer joins _before_ scheduled start time
 
 If the interviewer joins _before_ the scheduled start time of the interview, we skip
 the starts-now notification.
@@ -160,7 +164,7 @@ The worker will output should display something like the following:
 9:37:21 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
 ```
 
-#### Example workflow: Candidate joins _before_ interviewer joins
+### Example workflow: Candidate joins _before_ interviewer joins
 
 If the candidate joins before the interviewer does (and before the scheduled start time),
 we skip all follow up notifications.
@@ -189,7 +193,7 @@ Workflow not found. Call `start` before `update`.
 ```
 When the candidate joins, the workflow is ended, so subsequent calls have no effect.
 
-#### Example workflow: Interview cancellation
+### Example workflow: Interview cancellation
 
 Another common case is to schedule an interview and then cancel it:
 
@@ -206,7 +210,7 @@ The worker will output should display something like the following:
 9:30:36 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
 ```
 
-#### Simulating flaking services
+### Simulating flakey services
 
 One of the core capabilities of Temporal is to standardize and simplify retry logic. To
 exercise this logic, you can run the app with `NOTIFICATION_SERVICE_FLAKINESS`:
@@ -272,7 +276,7 @@ Subject: Your interview starts now
 
 ```
 
-#### Simulating unavailable workers
+### Simulating unavailable workers
 
 To simulate what happens when workers are unavailable, we simply start the workflow:
 ```sh
