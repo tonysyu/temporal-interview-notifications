@@ -8,14 +8,14 @@ scheduled interviews. The workflow can be visualized with the following flowchar
 
 ```mermaid
 graph TD
-    A((Start)) --> B[fa:fa-envelope fa:fa-share <br/> Interview <br/> confirmation]
+    A((Start)) --> B[Notification: <br/> Interview <br/> confirmation]
     B --> C((Wait for <br/> startTime or <br/> signal))
-    C -->|"Timer(startTime)"| D[fa:fa-envelope fa:fa-share <br/> interview <br/> starts-now]
+    C -->|"Timer(startTime)"| D[Notification: <br/> Interview <br/> starts-now]
  
-    C -->|CANCEL| E[fa:fa-envelope fa:fa-share <br/> Interview <br/> cancelled]
+    C -->|CANCEL| E[Notification: <br/> Interview <br/> cancelled]
     C -->|CANDIDATE_JOIN| Z((End))
-    C -->|INTERVIEWER_READY| F[fa:fa-envelope fa:fa-share <br/> Interviewer <br/> waiting]
-    D --> |INTERVIEWER_READY| G[fa:fa-envelope fa:fa-share <br/> Interviewer <br/> waiting]
+    C -->|INTERVIEWER_READY| F[Notification: <br/> Interviewer <br/> waiting]
+    D --> |INTERVIEWER_READY| G[Notification: <br/> Interviewer <br/> waiting]
     D --> |CANDIDATE_JOIN| Z
     E --> Z
     F --> Z
