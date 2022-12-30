@@ -1,7 +1,26 @@
 # Scheduled Interview Notification Worfklow Example
 
-The original code is based off the [Hello World Tutorial](https://learn.temporal.io/getting_started/typescript/hello_world_in_typescript/).
-The code was then modified based on the [Subscription Workflow Tutorial](https://learn.temporal.io/tutorials/typescript/subscriptions/).
+This code was originally based off Temporal's
+[Hello World Tutorial](https://learn.temporal.io/getting_started/typescript/hello_world_in_typescript/).
+
+That skeleton was modified to implement an example centered around notifications for
+scheduled interviews. The workflow can be visualized with the following flowchart:
+
+```mermaid
+graph TD
+    A((Start)) --> B[Send <br/> confirmation <br/> notification]
+    B --> C((Wait for <br/> startTime or <br/> signal))
+    C -->|"Timer(startTime)"| D[Send <br/> starts-now <br/> notification]
+ 
+    C -->|CANCEL| E[Send <br/> cancellation <br/> notification]
+    C -->|CANDIDATE_JOIN| Z((End))
+    C -->|INTERVIEWER_READY| F[Send <br/> Interviewer <br/> Waiting <br/> Notification]
+    D --> |INTERVIEWER_READY| G[Send <br/> Interviewer <br/> Waiting <br/> Notification]
+    D --> |CANDIDATE_JOIN| Z
+    E --> Z
+    F --> Z
+    G --> Z
+```
 
 ## Code organization
 
@@ -78,12 +97,16 @@ http $START user=alice
 The worker is responsible for running through the notification workflow and making
 requests to the "Notification Service". For the example above, the output looks like:
 ```sh
-2:45:08 PM: alice - Sent interview scheduled confirmation
-2:45:18 PM: alice - Sent interview starts now notification
+9:31:15 PM: alice - =========== Started workflow ===========
+9:31:15 PM: alice - Sent interview scheduled confirmation
+9:31:25 PM: alice - Sent interview starts now notification
+9:31:35 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
 ```
 
-Note that the last message will take some time to display (currently defined in workflow
-as 10 second delay).
+Note that the 'starts now' message will take some time to display---currently defined in
+workflow as a 10 second delay. The actual delay is typically around 12 seconds because
+the workflow calls multiple `condition`s with the 10 second delay, and each condition
+requires a roundtrip between Temporal Server and the Worker.
 
 ##### Web App output
 
@@ -108,7 +131,77 @@ Subject: Your interview starts now
 ...
 ```
 
-#### Cancellation workflow
+In many of the following examples, the mock emails will be left out of the explanation,
+but you should expect to see these mock emails in the app output.
+
+#### Example workflow: Interviewer joins _after_ scheduled start time
+
+If the interviewer joins _after_ the scheduled start time of the interview, we send an
+additional nudge to prompt the candidate to join.
+
+```sh
+http $START user=alice
+# Wait until after the starts-now notification before executing the following:
+http $UPDATE user=alice signal=INTERVIEWER_READY
+```
+
+The worker will output should display something like the following:
+```sh
+9:33:45 PM: alice - =========== Started workflow ===========
+9:33:45 PM: alice - Sent interview scheduled confirmation
+9:33:55 PM: alice - Sent interview starts now notification
+9:33:57 PM: alice - Sent interviewer waiting notification
+9:33:57 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
+```
+
+#### Example workflow: Interviewer joins _before_ scheduled start time
+
+If the interviewer joins _before_ the scheduled start time of the interview, we skip
+the starts-now notification.
+
+```sh
+http $START user=alice
+http $UPDATE user=alice signal=INTERVIEWER_READY
+```
+
+The worker will output should display something like the following:
+```sh
+9:37:19 PM: alice - =========== Started workflow ===========
+9:37:19 PM: alice - Sent interview scheduled confirmation
+9:37:21 PM: alice - Sent interviewer waiting notification
+9:37:21 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
+```
+
+#### Example workflow: Candidate joins _before_ interviewer joins
+
+If the candidate joins before the interviewer does (and before the scheduled start time),
+we skip all follow up notifications.
+
+```sh
+http $START user=alice
+http $UPDATE user=alice signal=CANDIDATE_JOIN
+http $UPDATE user=alice signal=INTERVIEWER_READY
+```
+
+The worker will output should display something like the following:
+```sh
+9:39:18 PM: alice - =========== Started workflow ===========
+9:39:18 PM: alice - Sent interview scheduled confirmation
+9:39:18 PM: alice - Candidate joined interview
+9:39:18 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
+```
+
+In the shell where we execute the requests, one of the responses will look similar to
+the following:
+```sh
+HTTP/1.1 400 Bad Request
+...
+
+Workflow not found. Call `start` before `update`.
+```
+When the candidate joins, the workflow is ended, so subsequent calls have no effect.
+
+#### Example workflow: Interview cancellation
 
 Another common case is to schedule an interview and then cancel it:
 
@@ -117,30 +210,12 @@ http $START user=alice
 http $UPDATE user=alice signal=CANCEL
 ```
 
-The worker will output the its interactions with the notification service:
+The worker will output should display something like the following:
 ```sh
-2:02:57 PM: alice - Sent interview scheduled confirmation
-2:02:59 PM: alice - Sent interview cancellation notification
-```
-
-And the notification service will "send" the confirmation and cancellation messages:
-
-```sh
-From: "alice" <alice@test.com>
-To: "Talent Attraction" <hiring@fake.org>
-Date: Tue, 27 Dec 2022 20:02:57 GMT
-Subject: Your interview is scheduled
-
-...
-
-
-From: "alice" <alice@test.com>
-To: "Talent Attraction" <hiring@fake.org>
-Date: Tue, 27 Dec 2022 20:02:59 GMT
-Subject: Your interview was cancelled
-
-...
-
+9:30:36 PM: alice - =========== Started workflow ===========
+9:30:36 PM: alice - Sent interview scheduled confirmation
+9:30:36 PM: alice - Sent interview cancellation notification
+9:30:36 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
 ```
 
 #### Simulating flaking services
@@ -162,6 +237,7 @@ The following example shows the confirmation notification is sent normally, and 
 there are multiple failed attempts to send the cancellation notification before finally
 succeeding:
 ```sh
+2:14:57 PM: alice - =========== Started workflow ===========
 2:14:57 PM: alice - Sent interview scheduled confirmation
 2022-12-27T20:15:07.785Z [WARN] Activity failed {
   ...
@@ -179,6 +255,7 @@ succeeding:
   ...
 }
 2:15:14 PM: alice - Sent interview starts now notification
+2:15:14 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
 ```
 Note that the first failed send is about 10 seconds after the confirmation notification
 (i.e. the pre-defined delay between scheduled and start). The first retry after that
@@ -205,4 +282,34 @@ Subject: Your interview starts now
 
 ...
 
+```
+
+#### Simulating unavailable workers
+
+To simulate what happens when workers are unavailable, we simply start the workflow:
+```sh
+http $START user=alice
+```
+
+And then after the workflow has started running, we can kill the worker (e.g. using
+`Ctrl-c` in that terminal):
+```sh
+9:42:35 PM: alice - =========== Started workflow ===========
+9:42:35 PM: alice - Sent interview scheduled confirmation
+<kill signal>
+2022-12-30T03:42:36.557Z [INFO] Worker state changed { state: 'STOPPING' }
+...
+2022-12-30T03:42:36.593Z [INFO] Worker state changed { state: 'STOPPED' }
+```
+
+After waiting a bit of time, we can restart the worker and see the execution continue
+without issue:
+```sh
+$ ./worker.sh
+
+2022-12-30T03:43:00.758Z [INFO] Creating worker {
+...
+2022-12-30T03:43:01.406Z [INFO] Worker state changed { state: 'RUNNING' }
+9:43:01 PM: alice - Sent interview starts now notification
+9:43:01 PM: alice - ~~~~~~~~~~ Completed workflow ~~~~~~~~~~
 ```

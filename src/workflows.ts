@@ -30,7 +30,7 @@ export async function interviewNotificationWorkflow(
     const startTime = Date.now() + ms(timeUntilInterviewStart);
     const endTime = startTime + ms(interviewDuration);
 
-    await act.logMessage(user, 'Started workflow');
+    await act.logMessage(user, '=========== Started workflow ===========');
     let isCancelled = false;
     let interviewerIsReady = false;
     let candidateHasJoined = false;
@@ -41,12 +41,17 @@ export async function interviewNotificationWorkflow(
 
     await act.notifyInterviewConfirmed(user);
 
-    if (await condition(() => candidateHasJoined, startTime - Date.now())) {
-        await act.logMessage(user, 'Candidate joined interview');
-    } else if (await condition(() => interviewerIsReady, startTime - Date.now())) {
-        await act.notifyInterviewerWaiting(user);
-    } else if (await condition(() => isCancelled, startTime - Date.now())) {
-        await act.notifyInterviewCancelled(user);
+    if (await condition(
+        () => (candidateHasJoined || interviewerIsReady || isCancelled),
+        startTime - Date.now())
+    ) {
+        if (candidateHasJoined) {
+            await act.logMessage(user, 'Candidate joined interview');
+        } else if (interviewerIsReady) {
+            await act.notifyInterviewerWaiting(user);
+        } else if (isCancelled) {
+            await act.notifyInterviewCancelled(user);
+        }
     } else {
         await act.notifyInterviewStartsNow(user);
         if (await condition(
@@ -56,5 +61,5 @@ export async function interviewNotificationWorkflow(
             await act.notifyInterviewerWaiting(user);
         }
     }
-    await act.logMessage(user, 'Completed workflow');
+    await act.logMessage(user, '~~~~~~~~~~ Completed workflow ~~~~~~~~~~');
 }
