@@ -107,16 +107,16 @@ interact with the Temporal Workflow, so the notification output can be seen in t
 shell:
 
 ```sh
-From: "alice" <alice@test.com>
-To: "Talent Attraction" <hiring@fake.org>
+From: "Talent Attraction" <hiring@fake.org>
+To: "alice" <alice@test.com>
 Date: Mon, 26 Dec 2022 20:45:08 GMT
 Subject: Your interview is scheduled
 
 ...
 
 
-From: "alice" <alice@test.com>
-To: "Talent Attraction" <hiring@fake.org>
+From: "Talent Attraction" <hiring@fake.org>
+To: "alice" <alice@test.com>
 Date: Mon, 26 Dec 2022 20:45:18 GMT
 Subject: Your interview starts now
 
@@ -256,8 +256,8 @@ longer due to exponential backoff. See <https://docs.temporal.io/concepts/what-i
 
 The app server displays the notifications plus some logging for the 503 errors:
 ```sh
-From: "alice" <alice@test.com>
-To: "Talent Attraction" <hiring@fake.org>
+From: "Talent Attraction" <hiring@fake.org>
+To: "alice" <alice@test.com>
 Date: Tue, 27 Dec 2022 20:14:57 GMT
 Subject: Your interview is scheduled
 
@@ -267,8 +267,8 @@ Subject: Your interview is scheduled
 503: Service Unavailable
 503: Service Unavailable
 
-From: "alice" <alice@test.com>
-To: "Talent Attraction" <hiring@fake.org>
+From: "Talent Attraction" <hiring@fake.org>
+To: "alice" <alice@test.com>
 Date: Tue, 27 Dec 2022 20:15:14 GMT
 Subject: Your interview starts now
 

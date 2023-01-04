@@ -6,8 +6,8 @@ export const mockEmail = function(user: string, subject: string): string {
     const from = '"Talent Attraction" <hiring@fake.org>';
     const date = new Date().toUTCString();
     return `
-        From: ${to}
-        To: ${from}
+        From: ${from}
+        To: ${to}
         Date: ${date}
         Subject: ${chalk.whiteBright.bold(subject)}
 
