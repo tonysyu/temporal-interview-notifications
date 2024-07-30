@@ -12,6 +12,12 @@ scheduled interviews. The workflow can be visualized with the following flowchar
 
 This workflow translates fairly directly into code in [workflows.ts](src/workflows.ts).
 
+I presented this example at a dev meeting at Indeed targeted towards engineers who
+didn't have any background with Temporal (like me). Here are the
+[slides](https://docs.google.com/presentation/d/e/2PACX-1vTERatN_Qjn0lasoGLofJ_yivsbZ7E33hBzF3rthhoFVqa9PmiWkz1LYgeojTt-0F00EzcBQKN6ZPcg/pub?start=false&loop=false&delayms=3000)
+for that presentation, but a lot of information that was only spoken is lost (and so is
+the recording of the presentation).
+
 ## Code organization
 
 To understand this code base, first review
